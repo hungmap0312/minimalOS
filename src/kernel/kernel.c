@@ -1,3 +1,4 @@
+#include "../../include/idt.h"
 #include "../../include/gdt.h"
 #include "../../include/console.h"
 
@@ -5,6 +6,8 @@ void kernel_main(void) {
     // Khởi tạo màn hình
     console_init();
     init_gdt();
+    init_idt();
+    console_write("IDT initialized.\n");
 
     // In các thông báo chào mừng có xuống dòng
     console_write("Hello MinimalOS!\n");

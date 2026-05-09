@@ -12,7 +12,13 @@ build/boot.o: src/boot/boot.asm
 build/gdt_flush.o: src/kernel/gdt_flush.asm
 	$(AS) $(ASFLAGS) $< -o $@
 
+build/idt_flush.o: src/kernel/idt_flush.asm
+	$(AS) $(ASFLAGS) $< -o $@
+
 build/gdt.o: src/kernel/gdt.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/idt.o: src/kernel/idt.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 build/console.o: src/kernel/console.c
@@ -21,7 +27,7 @@ build/console.o: src/kernel/console.c
 build/kernel.o: src/kernel/kernel.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-build/minimalos.bin: build/boot.o build/gdt_flush.o build/gdt.o build/console.o build/kernel.o
+build/minimalos.bin: build/boot.o build/gdt_flush.o build/idt_flush.o build/gdt.o build/idt.o build/console.o build/kernel.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
 minimalos.iso: build/minimalos.bin
