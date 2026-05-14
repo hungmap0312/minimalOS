@@ -33,7 +33,16 @@ build/interrupt.o: src/kernel/interrupt.asm
 build/isr.o: src/kernel/isr.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-build/minimalos.bin: build/boot.o build/gdt_flush.o build/idt_flush.o build/interrupt.o build/gdt.o build/idt.o build/isr.o build/console.o build/kernel.o
+build/pic.o: src/kernel/pic.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/pit.o: src/kernel/pit.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/pmm.o: src/kernel/pmm.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/minimalos.bin: build/boot.o build/gdt_flush.o build/idt_flush.o build/interrupt.o build/gdt.o build/idt.o build/isr.o build/pic.o build/pit.o build/pmm.o build/console.o build/kernel.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
 minimalos.iso: build/minimalos.bin
@@ -45,3 +54,4 @@ run: minimalos.iso
 
 clean:
 	rm -f build/*.o build/*.bin minimalos.iso isodir/boot/minimalos.bin
+
