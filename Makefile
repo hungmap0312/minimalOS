@@ -27,7 +27,13 @@ build/console.o: src/kernel/console.c
 build/kernel.o: src/kernel/kernel.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-build/minimalos.bin: build/boot.o build/gdt_flush.o build/idt_flush.o build/gdt.o build/idt.o build/console.o build/kernel.o
+build/interrupt.o: src/kernel/interrupt.asm
+	$(AS) $(ASFLAGS) $< -o $@
+
+build/isr.o: src/kernel/isr.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/minimalos.bin: build/boot.o build/gdt_flush.o build/idt_flush.o build/interrupt.o build/gdt.o build/idt.o build/isr.o build/console.o build/kernel.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
 minimalos.iso: build/minimalos.bin

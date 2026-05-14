@@ -8,10 +8,11 @@ void kernel_main(void) {
     init_gdt();
     init_idt();
     console_write("IDT initialized.\n");
-
-    // In các thông báo chào mừng có xuống dòng
     console_write("Hello MinimalOS!\n");
     console_write("Console module initialized successfully.\n");
     console_write("Kernel is ready for the next stage!\n");
     console_write("GDT initialized.\n");
+
+    // Gọi ngắt phần mềm để test
+    __asm__ volatile("int $0x3");
 }
