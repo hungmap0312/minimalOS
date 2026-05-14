@@ -35,3 +35,13 @@ void pic_remap(void) {
     outb(PIC1_DATA, a1);
     outb(PIC2_DATA, a2);
 }
+
+void pic_send_eoi(uint8_t irq) {
+    if (irq >= 8) {
+        // Nếu là ngắt từ Slave PIC (IRQ 8-15), phải gửi EOI cho cả Slave
+        outb(PIC2_COMMAND, 0x20);
+    }
+    // Luôn phải gửi EOI cho Master PIC
+    outb(PIC1_COMMAND, 0x20);
+}
+
