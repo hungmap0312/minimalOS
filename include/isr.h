@@ -12,5 +12,7 @@ typedef struct {
 } registers_t;
 
 void fault_handler(registers_t *r);
+void irq_handler(registers_t *r);
 
 #endif
+

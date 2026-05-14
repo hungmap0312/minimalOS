@@ -1,5 +1,6 @@
 #include "../../include/isr.h"
 #include "../../include/console.h"
+#include "../../include/pic.h"
 
 char *exception_messages[] = {
     "Division By Zero", "Debug", "Non Maskable Interrupt", "Breakpoint",
@@ -20,3 +21,21 @@ void fault_handler(registers_t *r) {
         for (;;); // Treo hệ thống
     }
 }
+
+// Biến đếm số lần timer tick
+uint32_t tick = 0;
+
+void irq_handler(registers_t *r) {
+    // Nếu là ngắt từ Timer (IRQ0 -> int_no = 32)
+    if (r->int_no == 32) {
+        tick++;
+        if (tick % 100 == 0) {
+            console_write("Tick: 1 second passed.\n");
+        }
+    }
+
+    // Bắt buộc phải gửi tín hiệu EOI (End of Interrupt) cho PIC
+    // r->int_no trừ đi 32 sẽ ra số thứ tự IRQ (từ 0 đến 15)
+    pic_send_eoi(r->int_no - 32);
+}
+
