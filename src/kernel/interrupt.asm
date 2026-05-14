@@ -62,7 +62,9 @@ isr_common_stub:
     mov fs, ax
     mov gs, ax
 
+    push esp
     call fault_handler
+    add esp, 4
 
     pop eax         ; Phục hồi Data Segment cũ
     mov ds, ax

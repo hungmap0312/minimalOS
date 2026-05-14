@@ -7,6 +7,7 @@ void kernel_main(void) {
     console_init();
     init_gdt();
     init_idt();
+
     console_write("IDT initialized.\n");
     console_write("Hello MinimalOS!\n");
     console_write("Console module initialized successfully.\n");
@@ -15,4 +16,7 @@ void kernel_main(void) {
 
     // Gọi ngắt phần mềm để test
     __asm__ volatile("int $0x3");
+
+    while(1) {
+    }
 }
