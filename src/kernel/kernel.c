@@ -5,6 +5,7 @@
 #include "../../include/pit.h"
 #include "../../include/multiboot.h"
 #include "../../include/pmm.h"
+#include "../../include/paging.h"
 
 // Lấy địa chỉ kết thúc kernel từ linker script
 extern uint32_t _kernel_end; 
@@ -28,6 +29,10 @@ void kernel_main(multiboot_info_t* mbd) {
     // Khởi tạo Quản lý bộ nhớ vật lý
     pmm_init(kernel_end_ptr, mem_size_kb);
     console_write("Physical Memory Manager initialized.\n");
+    
+    // Khởi tạo Paging (Bộ nhớ ảo)
+    init_paging();
+    console_write("Paging enabled successfully.\n");
 
     __asm__ volatile("sti");
 
@@ -38,6 +43,15 @@ void kernel_main(multiboot_info_t* mbd) {
     if (block1 != 0 && block2 != 0) {
         console_write("PMM Test: Allocated 2 frames successfully!\n");
     }
+    
+    /* // --- TEST PAGE FAULT ---
+    console_write("Testing Page Fault...\n");
+    
+    // Khai báo con trỏ volatile
+    volatile uint32_t *bad_ptr = (volatile uint32_t*)0xA0000000;
+    
+    // Ép CPU ghi dữ liệu vào vùng nhớ chưa được ánh xạ
+    *bad_ptr = 0x12345678; */
 
     while(1) {
     }

@@ -42,7 +42,10 @@ build/pit.o: src/kernel/pit.c
 build/pmm.o: src/kernel/pmm.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-build/minimalos.bin: build/boot.o build/gdt_flush.o build/idt_flush.o build/interrupt.o build/gdt.o build/idt.o build/isr.o build/pic.o build/pit.o build/pmm.o build/console.o build/kernel.o
+build/paging.o: src/kernel/paging.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/minimalos.bin: build/boot.o build/gdt_flush.o build/idt_flush.o build/interrupt.o build/gdt.o build/idt.o build/isr.o build/pic.o build/pit.o build/pmm.o build/paging.o build/console.o build/kernel.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
 minimalos.iso: build/minimalos.bin
