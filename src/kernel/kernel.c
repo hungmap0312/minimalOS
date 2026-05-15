@@ -6,6 +6,7 @@
 #include "../../include/multiboot.h"
 #include "../../include/pmm.h"
 #include "../../include/paging.h"
+#include "../../include/heap.h"
 
 // Lấy địa chỉ kết thúc kernel từ linker script
 extern uint32_t _kernel_end; 
@@ -33,6 +34,10 @@ void kernel_main(multiboot_info_t* mbd) {
     // Khởi tạo Paging (Bộ nhớ ảo)
     init_paging();
     console_write("Paging enabled successfully.\n");
+    
+    // Khởi tạo Heap
+    init_heap();
+    console_write("Kernel Heap initialized.\n");
 
     __asm__ volatile("sti");
 
@@ -52,6 +57,23 @@ void kernel_main(multiboot_info_t* mbd) {
     
     // Ép CPU ghi dữ liệu vào vùng nhớ chưa được ánh xạ
     *bad_ptr = 0x12345678; */
+    
+    // --- TEST KERNEL HEAP ---
+    uint32_t *ptr1 = (uint32_t *)kmalloc(100);
+    uint32_t *ptr2 = (uint32_t *)kmalloc(200);
+
+    if (ptr1 != 0 && ptr2 != 0) {
+        console_write("kmalloc test: Allocated successfully!\n");
+        *ptr1 = 0xABCD; // Thử ghi dữ liệu
+        *ptr2 = 0x1234;
+        
+        // Giải phóng
+        kfree(ptr1);
+        kfree(ptr2);
+        console_write("kfree test: Freed successfully!\n");
+    } else {
+        console_write("Heap allocation failed!\n");
+    }
 
     while(1) {
     }
