@@ -30,6 +30,7 @@ void fault_handler(registers_t *r) {
         // Nếu là Page Fault (Ngắt số 14)
         if (r->int_no == 14) {
             uint32_t fault_addr = get_faulting_address();
+            (void)fault_addr;
             console_write("Faulting Address: ");
             // Tạm thời chưa có hàm printf(%x), nếu bạn đã viết hàm in số Hex 
             // thì hãy in biến fault_addr ra đây để biết chính xác địa chỉ nào gây lỗi.

@@ -2,6 +2,7 @@
 #include "../../include/heap.h"
 #include "../../include/pmm.h"
 #include "../../include/console.h"
+#include "../../include/gdt.h"
 
 task_t *current_task = 0;
 task_t *ready_queue = 0;
@@ -91,5 +92,6 @@ void schedule() {
     if (old_task == new_task) return; // Nếu chỉ có 1 task thì không cần chuyển
 
     current_task = new_task;
+    set_kernel_stack(current_task->stack_limit + 4096);
     switch_context(old_task, new_task);
 }
