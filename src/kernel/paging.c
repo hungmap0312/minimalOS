@@ -51,3 +51,17 @@ void init_paging(void) {
     // 6. Kích hoạt Paging!
     enable_paging();
 }
+
+uint32_t *clone_kernel_directory(void) {
+    // Cấp phát 1 frame vật lý mới (4KB) để làm Page Directory cho Task mới
+    uint32_t *new_dir = (uint32_t*)pmm_alloc_frame();
+    if (!new_dir) return 0;
+
+    // Sao chép toàn bộ 1024 mục từ Page Directory gốc của Nhân
+    // Điều này đảm bảo Task mới kế thừa vùng Identity Mapping 4MB đầu tiên của Nhân
+    for (int i = 0; i < 1024; i++) {
+        new_dir[i] = page_directory[i];
+    }
+
+    return new_dir;
+}

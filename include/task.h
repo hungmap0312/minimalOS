@@ -13,6 +13,7 @@ typedef struct task {
     uint32_t esp;               // Offset 4 (Phải khớp với file switch.asm)
     task_state_t state;         // Offset 8
     uint32_t stack_limit;       // Offset 12 (Địa chỉ thấp nhất của stack 4KB)
+    uint32_t *page_directory;   // Lưu địa chỉ bảng phân trang riêng
     struct task *next;          // Offset 16 (Cho danh sách liên kết vòng)
 } task_t;
 

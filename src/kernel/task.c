@@ -3,6 +3,7 @@
 #include "../../include/pmm.h"
 #include "../../include/console.h"
 #include "../../include/gdt.h"
+#include "../../include/paging.h"
 
 task_t *current_task = 0;
 task_t *ready_queue = 0;
@@ -32,6 +33,8 @@ void init_tasking() {
     current_task = (task_t*)kmalloc(sizeof(task_t));
     current_task->id = 0;
     current_task->state = STATE_RUNNING;
+    extern uint32_t *page_directory; // Khai báo extern lấy từ paging.c
+    current_task->page_directory = page_directory; // Kernel Task dùng chung bảng gốc
     current_task->next = current_task; // Trỏ vào chính nó tạo thành vòng
     
     ready_queue = current_task;
@@ -47,6 +50,9 @@ task_t *create_task(void (*entry_point)()) {
     // Cấp phát 1 Frame (4KB) làm Stack
     uint32_t stack_addr = pmm_alloc_frame();
     new_task->stack_limit = stack_addr;
+    
+    // Tạo không gian địa chỉ ảo biệt lập bằng cách nhân bản từ bảng gốc
+    new_task->page_directory = clone_kernel_directory();
     
     // Đỉnh stack (Phát triển từ địa chỉ cao xuống thấp)
     uint32_t *stack = (uint32_t*)(stack_addr + 4096);
@@ -93,5 +99,10 @@ void schedule() {
 
     current_task = new_task;
     set_kernel_stack(current_task->stack_limit + 4096);
+    
+    // Nạp địa chỉ vật lý của Page Directory của Task mới vào thanh ghi CR3.
+    // MMU của CPU sẽ lập tức áp dụng bản đồ bộ nhớ ảo của Task mới.
+    __asm__ volatile("mov %0, %%cr3" : : "r"(current_task->page_directory));
+    
     switch_context(old_task, new_task);
 }

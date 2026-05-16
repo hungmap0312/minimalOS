@@ -9,6 +9,7 @@
 #define PAGE_USER     0x04   // Bit 2: Quyền User hay Kernel? (0 = Kernel)
 
 void init_paging(void);
+uint32_t *clone_kernel_directory(void);
 
 #endif
 
