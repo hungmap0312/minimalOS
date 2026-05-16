@@ -7,6 +7,24 @@
 #include "../../include/pmm.h"
 #include "../../include/paging.h"
 #include "../../include/heap.h"
+#include "../../include/task.h"
+
+// Task 1: In chữ 'A'
+void task1() {
+    while(1) {
+        console_write("A");
+        // Giả lập delay để mắt người kịp nhìn
+        for (volatile int i = 0; i < 10000000; i++); 
+    }
+}
+
+// Task 2: In chữ 'B'
+void task2() {
+    while(1) {
+        console_write("B");
+        for (volatile int i = 0; i < 10000000; i++);
+    }
+}
 
 // Lấy địa chỉ kết thúc kernel từ linker script
 extern uint32_t _kernel_end; 
@@ -17,7 +35,7 @@ void kernel_main(multiboot_info_t* mbd) {
     init_gdt();
     init_idt();
     pic_remap(); 
-    init_timer(100); 
+    init_timer(50); 
 
     console_write("IDT, GDT, PIC, PIT initialized.\n");
 
@@ -38,6 +56,14 @@ void kernel_main(multiboot_info_t* mbd) {
     // Khởi tạo Heap
     init_heap();
     console_write("Kernel Heap initialized.\n");
+    
+    // Bật hệ thống đa nhiệm
+    init_tasking();
+    console_write("Multitasking initialized.\n");
+    
+    // Tạo 2 task mới
+    create_task(task1);
+    create_task(task2);
 
     __asm__ volatile("sti");
 
@@ -75,6 +101,9 @@ void kernel_main(multiboot_info_t* mbd) {
         console_write("Heap allocation failed!\n");
     }
 
+    // Task chính (Kernel ban đầu) in chữ 'K'
     while(1) {
+        console_write("K");
+        for (volatile int i = 0; i < 10000000; i++);
     }
 }
