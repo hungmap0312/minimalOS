@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-// Cấu trúc này phải khớp chính xác với những gì ta đã push ở interrupt.asm
+// Cấu trúc lưu trữ trạng thái CPU khi có ngắt xảy ra
 typedef struct {
     uint32_t ds;                                     // Data segment selector
     uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; // Pushed bởi pusha

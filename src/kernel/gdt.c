@@ -1,5 +1,5 @@
 #include "../../include/gdt.h"
-#include <string.h> // Để dùng hàm memset (Nếu bạn chưa có string.h, có thể tự viết vòng lặp gán = 0)
+#include <string.h>
 
 struct gdt_entry_struct {
     uint16_t limit_low;
@@ -43,11 +43,9 @@ static void write_tss(int32_t num, uint16_t ss0, uint32_t esp0) {
     // Access byte: 0xE9 (Present = 1, DPL = 3, Executable = 0, Accessed = 1)
     gdt_set_gate(num, base, limit, 0xE9, 0x00);
 
-    // Khởi tạo toàn bộ TSS bằng 0 thủ công để tránh phụ thuộc thư viện string.h
+    // Khởi tạo toàn bộ TSS bằng 0
     uint8_t *tss_ptr = (uint8_t*)&tss_entry;
-    for (uint32_t i = 0; i < sizeof(tss_entry_t); i++) {
-        tss_ptr[i] = 0;
-    }
+    memset(tss_ptr, 0, sizeof(tss_entry_t));
 
     // Thiết lập các giá trị cốt lõi
     tss_entry.ss0  = ss0;   // Stack Segment của Kernel (0x10)
@@ -80,7 +78,6 @@ void init_gdt(void) {
     gdt_set_gate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // 0x20: User Data (DPL 3)
     
     // 0x28: TSS Segment (Selector 0x2B khi dùng)
-    // Tạm thời truyền esp0 = 0, Scheduler sẽ cập nhật giá trị này sau
     write_tss(5, 0x10, 0x0); 
 
     // Nạp GDT mới

@@ -24,11 +24,35 @@ void console_init(void) {
     }
 }
 
+// HÀM MỚI: Xử lý cuộn màn hình khi đầy
+static void console_scroll() {
+    // 1. Đẩy toàn bộ dữ liệu từ dòng 1->24 lên dòng 0->23
+    for (int y = 1; y < VGA_HEIGHT; y++) {
+        for (int x = 0; x < VGA_WIDTH; x++) {
+            int to_index = (y - 1) * VGA_WIDTH + x;
+            int from_index = y * VGA_WIDTH + x;
+            VGA_MEMORY[to_index] = VGA_MEMORY[from_index];
+        }
+    }
+
+    // 2. Xóa trắng dòng cuối cùng (dòng 24)
+    for (int x = 0; x < VGA_WIDTH; x++) {
+        int index = (VGA_HEIGHT - 1) * VGA_WIDTH + x;
+        VGA_MEMORY[index] = (uint16_t) ' ' | (uint16_t) terminal_color << 8;
+    }
+
+    // 3. Neo con trỏ lại ở dòng cuối cùng
+    terminal_row = VGA_HEIGHT - 1;
+}
+
 void console_putchar(char c) {
     // Xử lý ký tự xuống dòng
     if (c == '\n') {
         terminal_column = 0;
-        if (++terminal_row == VGA_HEIGHT) terminal_row = 0; // Tạm thời quay về dòng đầu nếu đầy
+        terminal_row++;
+        if (terminal_row == VGA_HEIGHT) {
+            console_scroll(); // Gọi hàm cuộn thay vì quay về 0
+        }
         return;
     }
 
@@ -39,12 +63,30 @@ void console_putchar(char c) {
     // Di chuyển con trỏ sang phải
     if (++terminal_column == VGA_WIDTH) {
         terminal_column = 0;
-        if (++terminal_row == VGA_HEIGHT) terminal_row = 0;
+        terminal_row++;
+        if (terminal_row == VGA_HEIGHT) {
+            console_scroll(); // Gọi hàm cuộn thay vì quay về 0
+        }
     }
 }
 
 void console_write(const char* str) {
     for (int i = 0; str[i] != '\0'; i++) {
         console_putchar(str[i]);
+    }
+}
+
+void console_write_hex(uint32_t n) {
+    console_write("0x"); // In tiền tố 0x
+    
+    // Một số 32-bit có 8 chữ số Hex (mỗi chữ số 4 bit)
+    for (int i = 28; i >= 0; i -= 4) {
+        uint8_t digit = (n >> i) & 0x0F; // Lấy ra 4 bit hiện tại
+        
+        if (digit < 10) {
+            console_putchar(digit + '0'); // Chuyển từ số 0-9 sang ký tự '0'-'9'
+        } else {
+            console_putchar(digit - 10 + 'A'); // Chuyển từ số 10-15 sang ký tự 'A'-'F'
+        }
     }
 }

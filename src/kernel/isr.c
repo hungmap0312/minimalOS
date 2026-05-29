@@ -14,7 +14,7 @@ char *exception_messages[] = {
     "Reserved", "Reserved", "Reserved", "Reserved"
 };
 
-// àm lấy giá trị CR2
+// Hàm lấy giá trị CR2
 static inline uint32_t get_faulting_address() {
     uint32_t cr2;
     __asm__ volatile("mov %%cr2, %0" : "=r" (cr2));
@@ -32,8 +32,8 @@ void fault_handler(registers_t *r) {
             uint32_t fault_addr = get_faulting_address();
             (void)fault_addr;
             console_write("Faulting Address: ");
-            // Tạm thời chưa có hàm printf(%x), nếu bạn đã viết hàm in số Hex 
-            // thì hãy in biến fault_addr ra đây để biết chính xác địa chỉ nào gây lỗi.
+            console_write_hex(fault_addr);
+            console_write("\n");
         }
         
         for (;;); // Treo hệ thống

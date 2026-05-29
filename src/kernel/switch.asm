@@ -16,11 +16,11 @@ switch_context:
     ; (Trường 'esp' nằm ở offset 4 trong cấu trúc task_t)
     mov [eax+4], esp
 
-    ; ---------------- BƯỚC NGOẶT (CONTEXT SWITCH) ----------------
+    ; ----------------(CONTEXT SWITCH)----------------
     ; 3. Nạp đỉnh ngăn xếp của task mới vào thanh ghi ESP
     mov esp, [edx+4]
     ; Kể từ dòng này, CPU đang sử dụng ngăn xếp của Task mới!
-    ; -------------------------------------------------------------
+    ; ------------------------------------------------
 
     ; 4. Phục hồi các thanh ghi callee-saved từ ngăn xếp CỦA TASK MỚI
     pop edi
